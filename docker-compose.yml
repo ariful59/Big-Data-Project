@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  spark-master:
+    build: .
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+    ports:
+      - "8080:8080"   # Master UI
+      - "7077:7077"   # Master Port
+    volumes:
+      - ./spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+      - spark-checkpoint:/tmp/spark-checkpoint
+      - ./app:/app
+    networks:
+      - spark-net
+
+  spark-worker-1:
+    build: .
+    container_name: spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
+      -
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"   # Worker UI
+    volumes:
+      - ./spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+      - spark-checkpoint:/tmp/spark-checkpoint
+      - ./app:/app
+    networks:
+      - spark-net
+
+  spark-worker-2:
+    build: .
+    container_name: spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
+    depends_on:
+      - spark-master
+    ports:
+      - "8082:8081"   # Worker UI
+    volumes:
+      - ./spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+      - spark-checkpoint:/tmp/spark-checkpoint
+      - ./app:/app
+    networks:
+      - spark-net
+
+#  nc:
+#    build: .
+#    container_name: nc
+#    command: [ "bash", "-lc", "echo 'Netcat listening on 0.0.0.0:9999'; while true; do nc -lk -p 9999; done" ]
+#    # map to host so you can do: nc localhost 9999
+#    ports:
+#      - "9999:9999"
+#    networks:
+#      - spark-net
+#    tty: true
+#    stdin_open: true
+
+volumes:
+  spark-checkpoint:
+
+networks:
+  spark-net:
+    driver: bridge
+

@@ -1,7 +1,7 @@
 
 # Big Data Project – Setup & Execution Guide
 
-## ✅ 1. Clone the Repository
+##  1. Clone the Repository
 ```bash
 git clone https://github.com/ariful59/Big-Data-Project.git
 cd Big-Data-Project
@@ -9,13 +9,13 @@ cd Big-Data-Project
 
 ---
 
-## ✅ 2. Install Docker
+##   2. Install Docker
 Make sure Docker and Docker Compose are installed.  
 [Install Docker](https://docs.docker.com/get-docker/) if not already installed.
 
 ---
 
-## ✅ 3. Start Spark Cluster (Master + 2 Workers)
+##  3. Start Spark Cluster (Master + 2 Workers)
 Build and start the cluster in detached mode:
 ```bash
 docker-compose up --build -d
@@ -28,7 +28,7 @@ This will create:
 
 ---
 
-## ✅ 4. Run Initial Setup Script
+##  4. Run Initial Setup Script
 Prepare the environment:
 ```bash
 python3 ./app/run_script.py
@@ -36,7 +36,7 @@ python3 ./app/run_script.py
 
 ---
 
-## ✅ 5. Ingest Data on Each Node
+##  5. Ingest Data on Each Node
 Run these commands to load data into Spark from each node:
 
 ### Master Node:
@@ -77,7 +77,7 @@ docker exec -it \
 
 ---
 
-## ✅ 6. Combine Data into Unified File
+##  6. Combine Data into Unified File
 Run the unification script on the master:
 ```bash
 docker exec -it spark-master \
@@ -88,7 +88,7 @@ This creates a unified Parquet dataset from all nodes.
 
 ---
 
-## ✅ 7. Data Preprocessing (Cleaning + Feature Engineering)
+##  7. Data Preprocessing (Cleaning + Feature Engineering)
 Run the preprocessing script:
 ```bash
 docker exec -it spark-master \
@@ -104,4 +104,5 @@ This step:
 
 ---
 
-
+## Goal:
+Predict whether a person earns more than $50K/year based on demographic and work-related attributes.

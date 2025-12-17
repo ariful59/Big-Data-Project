@@ -7,6 +7,7 @@ from pyspark.sql import SparkSession
 #   NODE_ID   = master | worker1 | worker2
 #   NODE_FILE = /master_data/adult_master.csv OR /worker1_data/... OR /worker2_data/...
 # Output base (shared by all): /app/data
+
 NODE_ID   = os.environ.get("NODE_ID", "unknown")
 NODE_FILE = os.environ.get("NODE_FILE")  # must be set per node
 OUT_BASE  = os.environ.get("OUT_BASE", "/app/data")

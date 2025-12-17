@@ -6,6 +6,19 @@ from pyspark.ml.feature import StringIndexer, OneHotEncoder, Imputer, VectorAsse
 from pyspark.ml.classification import LogisticRegression
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+from pyspark.sql import SparkSession
+
+INPUT_FILE  = "/app/output/unified/unified.parquet"  # your single parquet
+UNIFIED_OUT = "/app/output/final_unified"
+
+spark = SparkSession.builder.appName("ML_Pipeline").getOrCreate()
+
+df = spark.read.parquet(INPUT_FILE)
+
+# --- Repartitioning ---
+spark.conf.set("spark.sql.shuffle.partitions", "200")
+features = df.repartition(200, df["workclass"])  #you can choose other feature or no feature, fix value
+
 
 # Categorical columns (after engineering)
 cat_cols = [
@@ -40,7 +53,7 @@ stages = [imputer] + indexers + encoders + [assembler, scaler, lr]
 pipeline = Pipeline(stages=stages)
 
 # Train/test split
-train_df, test_df = features_df.randomSplit([0.8, 0.2], seed=42)
+train_df, test_df = df.randomSplit([0.8, 0.2], seed=42)
 
 # Hyperparameter grid
 param_grid = (

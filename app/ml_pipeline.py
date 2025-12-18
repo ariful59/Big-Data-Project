@@ -22,15 +22,28 @@ from pyspark.sql.functions import col, when
 # -----------------------------
 
 
-NODE_ID   = os.environ.get("NODE_ID", "unknown")              # master | worker1 | worker2
-if NODE_ID == "unknown":
-    INPUT_FILE = "/app/output/final_unified/final_dataset.parquet"
-else:
-    DATA_BASE = os.environ.get("OUT_BASE", "/app/data")  # same default used by ingest
-    INPUT_PATH = os.environ.get("INPUT_PATH", f"{DATA_BASE}/{NODE_ID}")  # Parquet directory
 
-spark = SparkSession.builder.appName("ML_Pipeline").getOrCreate()
-df = spark.read.parquet(INPUT_FILE)
+
+NODE_ID = os.environ.get("NODE_ID", "unknown")
+
+if NODE_ID == "unknown":
+    input_target = "/app/output/final_unified/final_dataset.parquet"
+    NODE_ID = "Normal Pipeline"
+else:
+    data_base = os.environ.get("OUT_BASE", "/app/data")
+    input_target = os.environ.get("INPUT_PATH", f"{data_base}/{NODE_ID}")
+
+# Note: os.path.exists works for local/host-mounted paths visible inside the container.
+if not os.path.exists(input_target):
+    raise FileNotFoundError(
+        f"Input path not found inside container: {input_target}\n"
+        f"NODE_ID={NODE_ID}, OUT_BASE={os.environ.get('OUT_BASE')}, INPUT_PATH={os.environ.get('INPUT_PATH')}\n"
+        "Check your Docker volume mounts and environment variables."
+    )
+
+
+spark = SparkSession.builder.appName(f"ML_Pipeline {NODE_ID}").getOrCreate()
+df = spark.read.parquet(input_target)
 
 # # Improve parallelism (optional)
 # spark.conf.set("spark.sql.shuffle.partitions", "200")

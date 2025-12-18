@@ -129,33 +129,51 @@ docker exec -it spark-master \
 
 
 
-## Run all together
+## Run all together Part-2
 ```bash
 # MASTER job
 docker exec -it \
   --env NODE_ID=master \
   spark-master \
   spark-submit \
+    --conf spark.cores.max=2 \
+    --conf spark.executor.instances=2 \
+    --conf spark.executor.cores=2 \
+    --conf spark.executor.memory=2g \
     --master spark://spark-master:7077  \
-    /app/ml_for_parallel.py &
+    /app/ml_pipeline.py &
  
 # WORKER 1 job
 docker exec -it \
   --env NODE_ID=worker1 \
   spark-worker-1 \
   spark-submit \
+    --conf spark.cores.max=2 \
+    --conf spark.executor.instances=2 \
+    --conf spark.executor.cores=2 \
+    --conf spark.executor.memory=2g \
+    --conf spark.ui.port=4040 \
     --master spark://spark-master:7077  \
-    /app/ml_for_parallel.py &
+    /app/ml_pipeline.py &
 
 # WORKER 2 job
 docker exec -it \
   --env NODE_ID=worker2 \
   spark-worker-2 \
   spark-submit \
+    --conf spark.cores.max=2 \
+    --conf spark.executor.instances=2 \
+    --conf spark.executor.cores=2 \
+    --conf spark.ui.port=4040 \
+    --conf spark.executor.memory=2g \
     --master spark://spark-master:7077  \
-    /app/ml_for_parallel.py
+    /app/ml_pipeline.py
 ```
 
+## Simultaneous Distributed Machine Learning on the Unified Dataset:
+
+docker exec -it spark-master \
+  spark-submit --master spark://spark-master:7077 /app/ml_pipeline.py
 
 
 

@@ -31,7 +31,7 @@ This will create:
 ##  4. Run Initial Setup Script
 Prepare the environment:
 ```bash
-python3 ./app/run_script.py
+python3 run_script.py
 ```
 
 ---
@@ -103,6 +103,11 @@ This step:
 - Writes the final dataset to `/app/output/final_unified`
 
 ---
+
+## 8. ML Pipeline
+docker exec -it spark-master \
+  spark-submit --master spark://spark-master:7077 /app/ml_pipeline.py
+
 
 ## Goal:
 Predict whether a person earns more than $50K/year based on demographic and work-related attributes.

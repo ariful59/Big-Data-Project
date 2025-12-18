@@ -22,7 +22,7 @@ for old, new in rename_map.items():
         df = df.withColumnRenamed(old, new)
 
 # --- Repartitioning ---
-spark.conf.set("spark.sql.shuffle.partitions", "200")
+spark.conf.set("spark.sql.shuffle.partitions", "100")
 df = df.repartition(200, df["workclass"])  #you can choose other feature or no feature, fix value
 
 # Register for SQL

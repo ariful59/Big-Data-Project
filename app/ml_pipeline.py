@@ -21,18 +21,16 @@ from pyspark.sql.functions import col, when
 # Paths & basic setup
 # -----------------------------
 INPUT_FILE  = "/app/output/final_unified/final_dataset.parquet"
-CV_MODEL_PATH = "/app/models/income_lr_cv_model"
-BEST_MODEL_PATH = "/app/models/income_lr_best_pipeline"
 
 spark = SparkSession.builder.appName("ML_Pipeline").getOrCreate()
 df = spark.read.parquet(INPUT_FILE)
 
-# Improve parallelism (optional)
-spark.conf.set("spark.sql.shuffle.partitions", "200")
-
-# If you expect skew by workclass, consider not using a partitioning column
-# or pick something with higher cardinality. We'll keep your choice here:
-df = df.repartition(200, df["workclass"])
+# # Improve parallelism (optional)
+# spark.conf.set("spark.sql.shuffle.partitions", "200")
+#
+# # If you expect skew by workclass, consider not using a partitioning column
+# # or pick something with higher cardinality. We'll keep your choice here:
+# df = df.repartition(200, df["workclass"])
 
 # -----------------------------
 # Columns configuration
@@ -109,36 +107,19 @@ pipeline = Pipeline(stages=stages)
 # -----------------------------
 train_df, test_df = df.randomSplit([0.8, 0.2], seed=42)
 
-# -----------------------------
-# Hyperparameter grid (CV)
-# -----------------------------
-param_grid = (
-    ParamGridBuilder()
-      .addGrid(lr.regParam, [0.0, 0.01, 0.1])
-      .addGrid(lr.elasticNetParam, [0.0, 0.5, 1.0])
-      .build()
-)
 
 # Primary evaluator (AUC ROC)
 evaluator_roc = BinaryClassificationEvaluator(
     labelCol="label", metricName="areaUnderROC"
 )
 
-# Cross-validation setup
-cv = CrossValidator(
-    estimator=pipeline,
-    estimatorParamMaps=param_grid,
-    evaluator=evaluator_roc,
-    numFolds=3,
-    parallelism=2,
-    seed=42
-)
-
 # -----------------------------
 # Fit & predict
 # -----------------------------
-cv_model = cv.fit(train_df)
-preds = cv_model.transform(test_df)
+
+final_pipeline = pipeline.fit(train_df)
+preds = final_pipeline.transform(test_df)
+
 
 # -----------------------------
 # Metrics
@@ -203,24 +184,3 @@ print(f"• F1        (positive class): {f1_pos:.4f}")
 print(f"• Accuracy  (from confusion): {accuracy_conf:.4f}")
 print("="*70 + "\n")
 
-# -----------------------------
-# Save models
-# -----------------------------
-# Save the full CrossValidatorModel (contains CV metadata + bestModel)
-cv_model.write().overwrite().save(CV_MODEL_PATH)
-
-# Save only the best fitted PipelineModel (lighter; ideal for inference)
-best_model = cv_model.bestModel
-best_model.write().overwrite().save(BEST_MODEL_PATH)
-
-print("Models saved:")
-print(f"   • CV model:    {CV_MODEL_PATH}")
-print(f"   • Best model:  {BEST_MODEL_PATH}")
-
-# Optional: print best LR params chosen by CV
-lr_model = best_model.stages[-1]  # last stage is LogisticRegressionModel
-print("\n Best Logistic Regression hyperparameters (from CV):")
-print(f"   • regParam:        {lr_model.getRegParam()}")
-print(f"   • elasticNetParam: {lr_model.getElasticNetParam()}")
-print(f"   • maxIter:         {lr_model.getMaxIter()}")
-print(f"   • threshold:       {lr_model.getThreshold()}")

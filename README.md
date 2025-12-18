@@ -105,11 +105,64 @@ This step:
 ---
 
 ## 8. ML Pipeline
+```bash
 docker exec -it spark-master \
   spark-submit --master spark://spark-master:7077 /app/ml_pipeline.py
+```
 
 
-## Goal:
-Predict whether a person earns more than $50K/year based on demographic and work-related attributes.
+## 9 ML with Hyperparameter
+```bash
+docker exec -it spark-master \
+  spark-submit --master spark://spark-master:7077 /app/ml_pipeline_with_hyper_paramater_and_cross_validation.py
+```
 
+
+
+split the dataset from final_dataset which is clean
+
+## Split Final Dataset
+```bash
+docker exec -it spark-master \
+  spark-submit --master spark://spark-master:7077 /app/split_final_dataset.py
+```
+
+
+
+## Run all together
+```bash
+# MASTER job
+docker exec -it \
+  --env NODE_ID=master \
+  spark-master \
+  spark-submit \
+    --master spark://spark-master:7077  \
+    /app/ml_for_parallel.py &
+ 
+# WORKER 1 job
+docker exec -it \
+  --env NODE_ID=worker1 \
+  spark-worker-1 \
+  spark-submit \
+    --master spark://spark-master:7077  \
+    /app/ml_for_parallel.py &
+
+# WORKER 2 job
+docker exec -it \
+  --env NODE_ID=worker2 \
+  spark-worker-2 \
+  spark-submit \
+    --master spark://spark-master:7077  \
+    /app/ml_for_parallel.py
+```
+
+
+
+
+history to access
+```bash
+docker exec -it spark-master bash -lc '
+  mkdir -p /tmp/spark-events &&
+  $SPARK_HOME/sbin/start-history-server.sh'
+```
 

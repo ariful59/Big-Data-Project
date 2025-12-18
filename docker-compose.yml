@@ -36,10 +36,13 @@ services:
       - spark-master
     ports:
       - "8081:8081"   # Worker UI
+      - "4040:4040"
+      - "18080:18080"
     volumes:
       - ./spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
       - ./app:/app
       - ./worker1_data:/worker1_data
+      - ./spark-events:/tmp/spark-events
     networks:
       - spark-net
 
@@ -49,17 +52,20 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=4G
-      - SPARK_WORKER_CORES=4
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
 
     depends_on:
       - spark-master
     ports:
       - "8082:8081"   # Worker UI (mapped to host 8082)
+      - "4040:4040"
+      - "18080:18080"
     volumes:
       - ./spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
       - ./app:/app
       - ./worker2_data:/worker2_data
+      - ./spark-events:/tmp/spark-events
     networks:
       - spark-net
 

@@ -23,7 +23,7 @@ for old, new in rename_map.items():
 
 # --- Repartitioning ---
 spark.conf.set("spark.sql.shuffle.partitions", "100")
-df = df.repartition(200, df["workclass"])  #you can choose other feature or no feature, fix value
+df = df.repartition(100, df["workclass"])  #you can choose other feature or no feature, fix value
 
 # Register for SQL
 df.createOrReplaceTempView("unified")

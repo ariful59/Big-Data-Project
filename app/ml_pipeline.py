@@ -8,7 +8,7 @@ Binary income classification with a full Spark ML pipeline:
 - Metrics: AUC(ROC/PR), Accuracy, F1, Precision/Recall (weighted & binary)
 - Model saving (CV model + best pipeline)
 """
-
+import os
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import StringIndexer, OneHotEncoder, Imputer, VectorAssembler, StandardScaler
 from pyspark.ml.classification import LogisticRegression
@@ -20,7 +20,14 @@ from pyspark.sql.functions import col, when
 # -----------------------------
 # Paths & basic setup
 # -----------------------------
-INPUT_FILE  = "/app/output/final_unified/final_dataset.parquet"
+
+
+NODE_ID   = os.environ.get("NODE_ID", "unknown")              # master | worker1 | worker2
+if NODE_ID == "unknown":
+    INPUT_FILE = "/app/output/final_unified/final_dataset.parquet"
+else:
+    DATA_BASE = os.environ.get("OUT_BASE", "/app/data")  # same default used by ingest
+    INPUT_PATH = os.environ.get("INPUT_PATH", f"{DATA_BASE}/{NODE_ID}")  # Parquet directory
 
 spark = SparkSession.builder.appName("ML_Pipeline").getOrCreate()
 df = spark.read.parquet(INPUT_FILE)

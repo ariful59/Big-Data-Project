@@ -213,7 +213,7 @@ docker exec -it \
 
 ---
 
-### 8) Simultaneous Distributed ML on Unified Dataset (Master)
+### 8) (Run with other tasks like the above when those three task are ongoing) Simultaneous Distributed ML on Unified Dataset (Master)
 ```bash
 docker exec -it spark-master \
   spark-submit --master spark://spark-master:7077 /app/ml_pipeline.py
@@ -228,7 +228,7 @@ docker exec -it spark-master \
 - Application UI (inside each job): `http://localhost:4040` (or the port you set)
 
 ### History Server (view past jobs)
-Ensure event logs dir exists and start the server in master container:
+Ensure the event logs directory exists and start the server in the master container:
 ```bash
 docker exec -it spark-master bash -lc 'mkdir -p /tmp/spark-events && \
   $SPARK_HOME/sbin/start-history-server.sh'

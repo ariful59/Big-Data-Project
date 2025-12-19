@@ -32,11 +32,10 @@ This project demonstrates:
 ## Architecture
 ```
 +-------------------+
-|   Spark Master    |
-|  (Driver Node)    |
+|   Spark Master    |  <-- Cluster Manager
 +-------------------+
         |
-        |  Spark Cluster: spark://spark-master:7077
+        |  spark://spark-master:7077
         |
 +-------------------+    +-------------------+
 | Spark Worker 1    |    | Spark Worker 2    |

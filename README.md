@@ -179,8 +179,7 @@ docker exec -it spark-master \
 
 history to access
 ```bash
-docker exec -it spark-master bash -lc '
-  mkdir -p /tmp/spark-events &&
+docker exec -it spark-master bash -lc 'mkdir -p /tmp/spark-events &&
   $SPARK_HOME/sbin/start-history-server.sh'
 ```
 

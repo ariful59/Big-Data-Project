@@ -1,9 +1,0 @@
-{
-    "node_id": "worker2",
-    "auc_roc": 0.9028754120497283,
-    "accuracy": 0.8440659925492283,
-    "f1_weighted": 0.8340888388732383,
-    "precision_weighted": 0.8366547692678613,
-    "recall_weighted": 0.8440659925492283,
-    "duration_seconds": 263.52950859069824
-}

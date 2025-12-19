@@ -1,9 +1,0 @@
-{
-    "node_id": "Normal Pipeline",
-    "auc_roc": 0.8968707983328826,
-    "accuracy": 0.8334618350038551,
-    "f1_weighted": 0.8231745189148186,
-    "precision_weighted": 0.8240211961586743,
-    "recall_weighted": 0.8334618350038551,
-    "duration_seconds": 380.61100363731384
-}

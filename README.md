@@ -247,15 +247,16 @@ Then open: `http://localhost:18080` for the History Server UI.
 ## Project Structure
 ```
 Big-Data-Project/
-│
+├── Dockerfile
 ├── docker-compose.yml
 ├── run_script.py
-├── ingest_data.py
-├── unified_file.py
-├── data_preprocessing.py
-├── ml_pipeline.py
-├── ml_pipeline_with_hyper_paramater_and_cross_validation.py
-├── split_final_dataset.py
+├── spark.default.conf
+|── app ├─ ingest_data.py
+        ├── unified_file.py
+        ├── data_preprocessing.py
+        ├── ml_pipeline.py
+        ├── ml_pipeline_with_hyper_paramater_and_cross_validation.py
+        ├── split_final_dataset.py
 └── README.md
 ```
 

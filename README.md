@@ -171,10 +171,10 @@ docker exec -it \
 ```
 
 ## Simultaneous Distributed Machine Learning on the Unified Dataset:
-
+```bash
 docker exec -it spark-master \
   spark-submit --master spark://spark-master:7077 /app/ml_pipeline.py
-
+```
 
 
 history to access

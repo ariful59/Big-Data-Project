@@ -9,6 +9,8 @@ Binary income classification with a full Spark ML pipeline:
 - Model saving (CV model + best pipeline)
 """
 import os
+import json
+import time
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import StringIndexer, OneHotEncoder, Imputer, VectorAssembler, StandardScaler
 from pyspark.ml.classification import LogisticRegression
@@ -20,9 +22,6 @@ from pyspark.sql.functions import col, when
 # -----------------------------
 # Paths & basic setup
 # -----------------------------
-
-
-
 
 NODE_ID = os.environ.get("NODE_ID", "unknown")
 
@@ -41,6 +40,8 @@ if not os.path.exists(input_target):
         "Check your Docker volume mounts and environment variables."
     )
 
+
+start_time = time.time()
 
 spark = SparkSession.builder.appName(f"ML_Pipeline {NODE_ID}").getOrCreate()
 df = spark.read.parquet(input_target)
@@ -203,4 +204,30 @@ print(f"• Recall    (positive class): {recall_pos:.4f}")
 print(f"• F1        (positive class): {f1_pos:.4f}")
 print(f"• Accuracy  (from confusion): {accuracy_conf:.4f}")
 print("="*70 + "\n")
+
+end_time = time.time()
+duration = end_time - start_time
+print(f"Total Execution Time: {duration:.2f} seconds")
+
+# -----------------------------
+# Save Metrics to JSON
+# -----------------------------
+metrics = {
+    "node_id": NODE_ID,
+    "auc_roc": auc_roc,
+    "accuracy": accuracy,
+    "f1_weighted": f1_weighted,
+    "precision_weighted": precision_weighted,
+    "recall_weighted": recall_weighted,
+    "duration_seconds": duration
+}
+
+metrics_dir = "/app/output/metrics"
+os.makedirs(metrics_dir, exist_ok=True)
+metrics_file = f"{metrics_dir}/{NODE_ID}_metrics.json"
+
+with open(metrics_file, "w") as f:
+    json.dump(metrics, f, indent=4)
+
+print(f"✅ Metrics saved to: {metrics_file}")
 
